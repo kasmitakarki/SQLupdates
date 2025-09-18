@@ -1,0 +1,301 @@
+1 SQL Server --> Multiple Database --> multiple tables --> multiple column
+
+--Type of Database
+
+1. System Database : this Database store in system database folder 
+
+name of folder is always fix ( master, model, msdb , tempdb)
+
+
+
+2. user define Database : this database store outside the folder 
+
+name of this folder define by the user 
+
+Rule for user define Database 
+
+1. database name always unique 
+
+2. database always not in existing name  
+
+
+
+
+
+create database 
+
+
+
+option 1 : 
+
+
+
+Create database < database Name >
+
+ for eg. 
+
+ want to create a database name as SQL_1029 
+
+
+
+ create database SQL_1029
+
+
+
+option 2 : RIght click on Database folder , then choose new database option , then 
+
+provide unique database name 
+
+
+
+table : collection of rows and columns 
+
+rows indicate no . of data 
+
+column indicate what type of data you store , column store similar data 
+
+
+
+RUle of table 
+
+1. table name always unique in one database 
+
+2. table name can not be key words 
+
+pre define or reserve word 
+
+for eg  create : not allowed 
+
+int : not allowed 
+
+3. table name can not store space between name 
+
+for eg . 
+
+student details : not Allowed 
+
+[Student Details] : Allowed 
+
+4. table name always start with english character 
+
+student_1
+
+_studnet 
+
+
+
+create table studentexample (ID INT)
+
+create table studentexample (ID INT)
+
+create table student example2 (ID INT)
+
+create table [student example2] (ID INT)
+
+create table table (ID INT)
+
+create table _table (ID INT)
+
+create table tabeldetails() 
+
+
+
+column : it conatin smiliar data 
+
+
+
+rule 
+
+1. column name is always uniqe in table 
+
+2. column name not allowed space between name 
+
+if needed the [column name]
+
+
+
+datatype : what kind data your are going to store into table 
+
+1. INT : it store only numeric value 
+
+for eg 
+
+1: allowed 
+
+123 : Allowed 
+
+12.34= 12 : Allowed 
+
+.34=0 :Allowed
+
+India : not Allowed 
+
+
+
+2. DECIMAL(total no. of digit, no. of digit after decimal)
+
+decimal(5,2)
+
+total no. of allowed digit : 5 
+
+after decimal =2
+
+before decimal=3 
+
+for eg
+
+12 = 12.00 : allowed 
+
+12.23=12.23 : allowed 
+
+1234.23 : not allowed 
+
+123.234= 123.23 : Allowed 
+
+123.236 = 123.24: Allowed 
+
+12.2=12.20 : Allowed 
+
+india: not Allowed
+
+
+
+3. char( no. of character) 
+
+char(5) : it store only 5 character 
+
+for eg
+
+12 : Allowed 
+
+12.2345 : not allowed because more then define character 
+
+india : Allowed 
+
+@@ : Allowed 
+
+शुभ : not allowed 
+
+
+
+4. varchar( no. of character ) 
+
+varchar(5) : it store only 5 character 
+
+for eg
+
+12 : Allowed 
+
+12.2345 : not allowed because more then define character 
+
+india : Allowed 
+
+@@ : Allowed 
+
+शुभ : not allowed 
+
+
+
+declare @v1 char(5),@v2 varchar(5)
+
+SET @v1='In'
+
+SET @v2='In'
+
+SELECT @v1,@v2
+
+
+
+4. nvarchar( no. of character ) 
+
+nvarchar(5) : it store only 5 character 
+
+for eg
+
+12 : Allowed 
+
+12.2345 : not allowed because more then define character 
+
+india : Allowed 
+
+@@ : Allowed 
+
+शुभ : not allowed 
+
+
+
+declare @v1 char(5),@v2 varchar(5),@v3 nvarchar(5)
+
+SET @v1='صباح الخير'
+
+SET @v2='صباح الخير'
+
+SET @v3=N'صباح الخير'
+
+SELECT @v1,@v2,@v3
+
+
+
+Date : it accept only date value 
+
+12/06/1987 : Allowed
+
+12 June 1987 : Allowed 
+
+Twelve june nonteen eighty seven : Not allowed 
+
+
+
+create table name as employee 
+
+tell me how many column going to create and data type of that column 
+
+sushobhit Raman
+
+first name & last name ?
+
++91 
+
+
+
+create table employeeDetails 
+
+(
+
+EmployeeID int,
+
+FirstName varchar(100),
+
+LastName varchar(100),
+
+DOB date,
+
+Gender CHAR(1),
+
+HireDate date,
+
+Salary DECIMAL(10,2),
+
+JobTitle varchar(100),
+
+phoneNo varchar(20),
+
+house# varchar(100),
+
+Street# varchar(100),
+
+area varchar(100),
+
+city varchar(100),
+
+country varchar(100),
+
+state varchar(100),
+
+zip code int
+
+)
+
+house #,Street #, area, city , state, country,zipcode
+
+create table name as stundet
