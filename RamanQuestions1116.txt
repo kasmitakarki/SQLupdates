@@ -1,0 +1,240 @@
+1. use of execute process task to automate unzipping of files before etl with configuration and error handling
+Steps:
+Add Execute Process Task:
+Drag and drop the "Execute Process Task" in your SSIS package Control Flow.
+
+Set Executable Path:
+
+Configure the "Executable" property to point to the unzip utility (e.g., C:\Program Files\7-Zip\7z.exe for 7-Zip).
+Ensure the unzip utility is installed on the server.
+Configure Arguments:
+
+Set the "Arguments" property to define the unzip command. For example:
+plaintext
+Copy
+x "C:\Source\File.zip" -o"C:\Destination\"
+x is the extract command for 7-Zip.
+Use -o to specify the output directory.
+Set Working Directory:
+
+Define the "WorkingDirectory" property to the location where the unzip utility will execute.
+Dynamic File Paths:
+
+Use SSIS variables for dynamic file paths (e.g., zip file path and output folder).
+Map these variables in the "Expressions" property of the Execute Process Task.
+Error Handling:
+
+Set the "FailTaskIfReturnCodeIsNotSuccessValue" property to True.
+Configure the "SuccessValue" property to match the expected return code (e.g., 0 for success).
+Log Errors:
+
+Redirect standard error output to a file using the -slt or equivalent option of the unzip utility.
+Capture error messages using SSIS logging.
+Retry Logic (Optional):
+
+Wrap the Execute Process Task in a container (e.g., For Loop or Retry pattern) to handle transient unzip issues.
+Test and Validate:
+
+Test the task with sample files to ensure it extracts files correctly and handles errors gracefully.
+Integrate with ETL Workflow:
+
+Place the Execute Process Task before data transformation tasks in the Control Flow.
+Tips:
+Use event handlers to log and manage errors during execution.
+Ensure adequate permissions for file paths and utilities.
+Validate the unzip tool's compatibility with your file types.
+
+
+
+implement script task to send email only when data-validation fails and what variables do we manage for recipients, subject, body
+
+Steps to Implement Script Task for Sending Email on Validation Failure:
+Add Script Task:
+Drag and drop a Script Task into your SSIS Control Flow.
+
+Create Variables:
+Define SSIS variables to hold email-related information:
+
+Recipients (EmailRecipients) - Stores email addresses (comma-separated for multiple recipients).
+Subject (EmailSubject) - Stores the subject of the email.
+Body (EmailBody) - Stores the body content of the email.
+ValidationStatus (IsValidationFailed) - Boolean variable to indicate validation failure (default: False).
+Set Precedence Constraint:
+Use a precedence constraint to execute the Script Task only if IsValidationFailed is True.
+
+Edit Script Task:
+Double-click the Script Task, select the language (C# or VB), and configure the variables as ReadOnlyVariables (for email content) and ReadWriteVariables (if the Script manipulates variables).
+
+Write Script to Send Email:
+In the Script Task editor, implement the email logic using .NET System.Net.Mail namespace.
+
+Configure Variables for Email Content:
+EmailRecipients: Assign a list of recipient email addresses (e.g., user1@example.com,user2@example.com).
+EmailSubject: Set a subject like "Data Validation Failed".
+EmailBody: Create a dynamic message with details about the validation failure (e.g., rows that failed validation).
+Steps for Validation Logic:
+Execute data validation logic (e.g., using a Data Flow Task or SQL query).
+
+If validation fails, set the IsValidationFailed variable to True.
+
+Example: Use a Script Task or Execute SQL Task to update the variable based on validation results.
+Ensure the Script Task for sending the email is executed only when IsValidationFailed is True, using a precedence constraint.
+
+Error Handling and Logging:
+Log email sending success or failure using SSIS event handlers or Script Task logging (Dts.Events.FireInformation and Dts.Events.FireError).
+Use a try-catch block in the Script Task to handle SMTP errors gracefully.
+Summary of Variables:
+EmailRecipients: Holds recipient email addresses.
+EmailSubject: Contains the subject of the email.
+EmailBody: Stores the email body content (e.g., validation error details).
+IsValidationFailed: Boolean flag to trigger email sending.
+This setup ensures the Script Task sends an email only when there is a validation failure.
+
+
+
+configure file system task to rename and move files dynamically using ssis varaibles for target paths and file names
+
+Steps to Configure File System Task for Dynamic File Rename and Move
+1. Add Variables
+Define the following SSIS variables to handle dynamic paths and file names:
+
+SourceFilePath: Full path of the source file (e.g., C:\SourceFolder\OldFileName.txt)
+TargetFolderPath: Destination folder where the file should be moved (e.g., C:\TargetFolder\)
+TargetFileName: New name for the file after moving (e.g., NewFileName.txt)
+TargetFilePath: Full path of the file in the target folder (calculated dynamically as TargetFolderPath + TargetFileName).
+2. Create TargetFilePath Using Expressions
+Open Variables in SSIS.
+Set an Expression for TargetFilePath to dynamically combine TargetFolderPath and TargetFileName.
+Example Expression:
+text
+Copy
+@[User::TargetFolderPath] + @[User::TargetFileName]
+3. Add File System Task
+Drag and drop a File System Task into the SSIS Control Flow.
+
+4. Configure File System Task Properties
+Double-click the File System Task and configure the following properties:
+
+General Tab:
+
+IsDestinationPathVariable: Set to True (to use TargetFilePath dynamically).
+DestinationVariable: Select TargetFilePath (dynamic target path).
+IsSourcePathVariable: Set to True (to use SourceFilePath dynamically).
+SourceVariable: Select SourceFilePath (dynamic source path).
+Operation:
+
+Choose Rename File or Move File as per your requirement:
+Move File: Moves the file to the target location and renames it.
+Rename File: Renames the file in the same directory.
+5. Set Precedence Constraints (Optional)
+Add validation or conditions to control when the File System Task runs (e.g., ensure the file exists before moving/renaming).
+6. Test the Package
+Assign sample values to your variables (e.g., source path, target folder, and new file name).
+Run the package to ensure the file is successfully renamed and moved to the target location dynamically.
+Dynamic Example Setup
+Example Variable Values:
+SourceFilePath: C:\SourceFolder\File1.txt
+TargetFolderPath: C:\TargetFolder\
+TargetFileName: RenamedFile1.txt
+TargetFilePath: (Expression Result) C:\TargetFolder\RenamedFile1.txt
+Tips and Best Practices
+File Existence Validation:
+Use a Script Task or File System Task to check if the file exists before renaming/moving.
+
+Error Handling:
+Configure SSIS logging to capture errors during file operations.
+
+Dynamic Paths:
+Ensure variables are properly configured with expressions for dynamic folder paths or file names.
+
+Permissions:
+Verify that the SSIS runtime account has read/write permissions for the source and target folders.
+
+Scenario: Using Execute Package Task for ETL Components
+Scenario Overview
+You have a large ETL process that involves multiple steps:
+
+Extract Data: Retrieve data from source systems (e.g., SQL Server, Flat Files, or APIs).
+Transform Data: Apply transformations such as cleaning, filtering, and aggregating.
+Load Data: Insert the transformed data into a destination database (e.g., Data Warehouse).
+To make the ETL process modular and manageable, you can split the ETL workflow into three separate packages (Extract, Transform, Load) and use the Execute Package Task to orchestrate and control the flow from a Master Package.
+
+Step-by-Step Design
+1. Create Individual ETL Packages
+Split the ETL process into three separate SSIS packages:
+
+Extract Package:
+
+Configure data extraction logic to pull data from the source (e.g., SQL Server, Flat Files, or APIs).
+Use Data Flow Tasks, Execute SQL Tasks, or Script Tasks for extraction.
+Save extracted files or data into staging tables or intermediate files.
+Transform Package:
+
+Apply transformations to clean and process the data.
+Use Data Flow Tasks with transformations like Lookup, Derived Column, Conditional Split, and Aggregation.
+Save the transformed data into staging tables or files.
+Load Package:
+
+Load the transformed data into the destination database (e.g., Data Warehouse).
+Use Data Flow Tasks to insert data into tables or update records.
+Implement error handling and logging for failed inserts/updates.
+2. Create a Master Package
+The Master Package orchestrates the execution of the individual packages (Extract, Transform, Load) using the Execute Package Task.
+
+Designing the Master Package
+Add Execute Package Tasks:
+
+Drag and drop three Execute Package Tasks into the Control Flow of the Master Package.
+Name them:
+Execute Extract Package
+Execute Transform Package
+Execute Load Package
+Configure Execute Package Tasks:
+
+Double-click each Execute Package Task and configure its properties:
+Reference Type:
+Use Project Reference if the child packages are part of the same SSIS project.
+Use External Reference if the child packages are deployed separately.
+Package Name: Select the corresponding child package (Extract, Transform, Load).
+Parameter Mapping: Pass parameters or variables (e.g., file paths, connection strings) if required by the child packages.
+Set Precedence Constraints:
+
+Connect the Execute Package Tasks in sequence using precedence constraints:
+Execute Extract Package → Execute Transform Package → Execute Load Package.
+Use Success constraints to ensure each package runs only if the previous one succeeds.
+Logging and Error Handling:
+
+Enable logging in the Master Package and child packages to track errors or execution details.
+Use Event Handlers to capture errors at the package level.
+Use precedence constraints with Failure paths to handle errors (e.g., send email notifications or retry logic).
+Dynamic Flow Control with Variables
+Pass Variables Between Packages:
+
+Use SSIS project-level parameters or variables to pass dynamic values (e.g., file paths, connection strings) to child packages.
+In the Execute Package Task, map the variables or parameters from the Master Package to child packages.
+Conditional Execution of Tasks:
+
+Use expressions in precedence constraints (e.g., @IsDataValid == True) to execute tasks conditionally based on runtime variables or validation results.
+Example Execution Flow
+Master Package Control Flow:
+Execute Extract Package: Extracts data from source systems and stores it in staging tables or files.
+
+If extraction fails, send an email notification or stop execution.
+Execute Transform Package: Processes and transforms the data.
+
+If transformation fails, log the error and retry the task.
+Execute Load Package: Loads the transformed data into the destination database.
+
+If loading fails, send an alert email and take corrective action.
+Benefits of Using Execute Package Task
+Modularity: Splitting the ETL process into multiple packages makes it easier to design, debug, and maintain.
+Reusability: Individual packages can be reused across different workflows.
+Scalability: Modular packages can be executed independently or integrated into different workflows.
+Dynamic Execution: Easily pass parameters to child packages for dynamic execution.
+Best Practices
+Parameter Passing: Use project parameters or variables for dynamic file paths, connection strings, or other runtime values.
+Logging: Enable logging in both the Master Package and child packages to capture execution details.
+Error Handling: Implement robust error handling in each package to handle failures gracefully.
+Performance Optimization: Optimize each package to handle large datasets efficiently.
+Summary
+Using the Execute Package Task in a Master Package allows you to orchestrate and control the flow of modular ETL components (Extract, Transform, Load). This design improves manageability, scalability, and reusability of your ETL workflow.
